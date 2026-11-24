@@ -1,4 +1,6 @@
 HELP.md
+# Archivos de Mac
+.DS_Store
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
