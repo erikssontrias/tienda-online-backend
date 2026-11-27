@@ -1,5 +1,6 @@
 package com.kultstudio.backend.controllers;
 
+import com.kultstudio.backend.dto.ProductoDTO;
 import com.kultstudio.backend.models.Producto;
 import com.kultstudio.backend.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,44 +18,45 @@ public class ProductoController {
     private ProductoService productoService;
 
     @GetMapping
-    public List<Producto> listarProductos() {
-        return productoService.obtenerTodos();
+    public List<ProductoDTO> listarProductos() {
+        return productoService.obtenerTodosDTO();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerProducto(@PathVariable Integer id) {
-        return productoService.obtenerPorId(id)
+    public ResponseEntity<ProductoDTO> obtenerProducto(@PathVariable Integer id) {
+        return productoService.obtenerPorIdDTO(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/categoria/{idCategoria}")
-    public List<Producto> listarPorCategoria(@PathVariable Integer idCategoria) {
-        return productoService.obtenerPorCategoria(idCategoria);
+    public List<ProductoDTO> listarPorCategoria(@PathVariable Integer idCategoria) {
+        return productoService.obtenerPorCategoriaDTO(idCategoria);
     }
 
     @PostMapping
-    public Producto crearProducto(@RequestBody Producto producto) {
-        return productoService.guardar(producto);
+    public ProductoDTO crearProducto(@RequestBody Producto producto) {
+        return productoService.guardarYConvertir(producto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@PathVariable Integer id, @RequestBody Producto productoActualizado) {
-        return productoService.obtenerPorId(id)
+    public ResponseEntity<ProductoDTO> actualizarProducto(@PathVariable Integer id, @RequestBody Producto productoActualizado) {
+        return productoService.obtenerEntidadPorId(id)
                 .map(producto -> {
                     producto.setSku(productoActualizado.getSku());
                     producto.setNombre(productoActualizado.getNombre());
                     producto.setDescripcion(productoActualizado.getDescripcion());
                     producto.setPrecio(productoActualizado.getPrecio());
+                    producto.setImagen(productoActualizado.getImagen());
                     producto.setCategoria(productoActualizado.getCategoria());
-                    return ResponseEntity.ok(productoService.guardar(producto));
+                    return ResponseEntity.ok(productoService.guardarYConvertir(producto));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Integer id) {
-        if (productoService.obtenerPorId(id).isPresent()) {
+        if (productoService.obtenerEntidadPorId(id).isPresent()) {
             productoService.eliminar(id);
             return ResponseEntity.noContent().build();
         }
